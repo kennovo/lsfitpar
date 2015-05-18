@@ -1,0 +1,109 @@
+Performs least-squares fit of bonded molecular mechanics parameters to\n
+conformational energies and corresponding measurements, applying\n
+robustness-enhancing restraints described in [1] K. Vanommeslaeghe,\n
+M. Yang, A. D. MacKerell Jr., J. Comput. Chem. 2015, DOI:10.1002/jcc.23897 .\n
+Please cite the above paper when publishing results obtained with this program!\n
+\n
+Usage: Print help or version information: %s [-h|--version]\n
+       Run fully interactively: %s [-i] <prm file> [<ene file>]\n
+       Run from command-line: %s [-i] <qm energies> <mm energies>\n
+  <prm file> [<ene file>] [-w <weights>] [-g <groups>]\n
+  [-u|-t|--abs] [-b <bias>] [--no-comp] [-e <measurements>]...\n
+  [-p '<parameter>' [-q '<parameter>' |\n
+    [-m '<multiplicities>' [-w <m_weight>] [-b <bias>] [-f|-a]]...]]...\n
+\n
+Schematic of command-line usage:\n
+%s [-i] <qm energies> <mm energies> <prm file> [<ene file>]\n
+%*s|   [-w <weights>] [-g <groups>] [-u|-t|--abs] [-b <bias>]\n
+%*s|   [--no-comp] [-e <measurements>]...\n
+%*s|\n
+%*s+-- [-p '<parameter>'\n
+%*s|     |\n
+%*s|     +-- [-m '<multiplicities>' [-w <m_weight>] [-b <bias>] [-f|-a]]\n
+%*s|     |\n
+%*s|     `-- ... ]\n
+%*s|\n
+%*s+-- ...\n
+%*s|\n
+%*s+-- [-p '<parameter>' -q '<parameter>']\n
+%*s|\n
+%*s`-- ...\n
+\n
+Where: -h, -?, --help, --HELP displays this help message and exits\n
+       --version displays version and licensing information, then exits\n
+       <qm energies>: ASCII file containing 1 QM energy / line (m(*) lines)\n
+       <mm energies>: ASCII file containing 1 MM energy / line (m(*) lines)\n
+       -i, --interactive requests interactive mode, which also is automatically\n
+  assumed when 1 or 2 command-line arguments are given.\n
+       -w, --conf-weights <weights>: when used outside a multiplicity section\n
+  (see below), specify ASCII file containing 1 weight factor / line (m(*) lines)\n
+       -g, --groups <groups>: specify ASCII file containing\n
+  1 integer group ID / line (m(*) lines)\n
+       -u --uniform requests uniform bias (see [1] above). This is the default.\n
+       -t --target-adapted requests target-adapted (see [1] above).\n
+       --abs requests \"absolute value\" bias. This is not the constant bias\n
+  in [1], but rather an experimental variation of the target-adapted bias that\n
+  did not perform well enough to make in into the paper. Not recommended - only\n
+  for compatibility with runs performed during alpha testing.\n
+       -b, --glob-bias <bias>: specify global bias fraction. Default: %g .\n
+  Can selectively be overridden by per-multiplicity biases; see below.\n
+       --no-comp disables bias compensation. Not recommended.\n
+       -e --measure <measurements>: specify ASCII file containing all m(*)\n
+  measurements of a specific degree of freedom (DF; bond length, angle,...),\n
+  1/line. The first line contains the atom types that define the parameter\n
+  associated with this DF, optionally along with its initial guess, for a total\n
+  of m+1 lines. This flag is repeated as many times as there are relevant DF,\n
+  carefully including *all* DF associated with parameters being fitted, even DF\n
+  that are not actively scanned!\n
+       -p --parameter '<parameter>': specify a parameter being fitted by its\n
+  defining atom types (enclosed in quotes). Starts a parameter section\n
+  consisting of either a -q flag or a parameter definition containing 0 or more\n
+  of the other flags detailed below.\n
+       -q --equivalent-to '<parameter>': make the parameter specified by\n
+  the -p preceding -q equivalent to the parameter specified by -q .\n
+       -m --multiplicities '<multiplicities>': fit one or more multiplicities\n
+  (e.g. 246) ranging from 0 to 6, where 0 is a harmonic potential that should\n
+   be used exclusively for bonds, angles and improper dihedrals, and is the\n
+  default for these types of parameters. Starts a multiplicity section\n
+  containing 0 or more of the attributes detailed below. A parameter section\n
+  can contain more than one multiplicity section if different attributes are\n
+  desired for different mutiplicities.\n
+       -w --mult-weight <m_weight>: when used inside a multiplicity section,\n
+  specify per-multiplicity weight factor. Defaults: 1.0 for dihedrals,\n
+  %g for angles and impropers, %g for bonds.\n
+       -b --mult-bias <bias>: when used inside a multiplicity section,\n
+  overrides the global bias fraction only for the selected multiplicities.\n
+ /     -f --fix-phase : fix phases for selected multiplicities.\n
+/      -a --vary-phase : allow phases for selected multiplicities to vary.\n
+\\ A -f or -a flag is only mandatory for angles; bonds are assumed variable and\n
+ \\dihedrals and impropers fixed unless specified otherwise.\n
+\n
+(*) m is the number of conformations, as discussed in [1] above.\n
+\n
+Note: specifying options in a different order than above is not supported.\n
+Tips: - Long command lines can be replaced with orderly input files by using\n
+the 'xargs' UNIX tool as follows: xargs ./lsfitpar <lsfit_input_file\n
+      - If you're on a terminal that doesn't scroll and you're seeing only this\n
+part, consider piping the output to \"less\" or redirecting it to a file. :-P\n
+
+Notes to self
+-------------
+- change %g to %f or %i where opportune
+- this is a mockup of what it may *ultimately* loook like; in 0.9.0, we'll
+restrict it to only one multiplicity section per parameter section and no
+per-multiplicity biases or weights.
+- we want to make the code flexible enough to keep the possibility open for a
+command-line to be read from a config file (like xargs, but without the
+character limit) in the future
+- since we'll implement fixed phases for the angles, we'll need to uniformize
+the way phase variation is handled in the interactive interface, too. Let's
+make it so that by default, bond are variable, dihedrals and impropers are
+fixed, and angles are always asked.
+- if the -i flag is provided together with any number of non-interactive flags,
+we ask questions interactively to fill in any and all data that is missing from
+the command line. We don't do this if the -i flag is not given as that would be
+really annoying when calling from a shell script or other application, because
+a lot of input validation would be required from the caller to prevent an
+accidentally spawned interactive interface from eating stdin and/or freezing
+up. Simply issuing a message on stderr and exiting nonzero is much
+user-friendlier in that respect.

@@ -1,0 +1,41 @@
+Introduction
+============
+Welcome to the lsfitpar program for robust fitting of bonded parameters. This program is the C reference implementation of our restrained Linear Least Squares (LLS) procedure to simultaneously fit all the bonded parameters in a Class I force field. The restraining strategy used in this methodology is novel and overcomes robustness issues in the LLS fitting of bonded parameters while minimally impacting the fitted values of well-behaved parameters. All of this and more is explained in the following paper: [1] K. Vanommeslaeghe, M. Yang, A. D. MacKerell Jr., J. Comput. Chem. 2015, DOI:10.1002/jcc.23897
+
+Compiling
+=========
+This program depends on BLAS and LAPACK libraries as included in (among others) ATLAS, ACML, MKL, OpenBLAS,... The easiest way to install these on Debian-based Linux distributions (including the popular Linux Mint and Ubuntu) is:
+$ sudo apt-get install libblas-dev liblapack-dev
+Installation on other distributions should be very analogous. If gcc is used and the libraries are installed in the standard paths, the next step is simply:
+$ make
+This should produce a ready-to-run binary called lsfitpar that can be copied to a location that is part of the user's $PATH ( $HOME/bin is often a good choice). System-wide installation should be performed manually in /usr/local/bin or /opt ; we currently do not provide "make install" functionality (nor a man page or configure script).
+If a different compiler or nonstandard libraries are desired, the variables CC , CFLAGS and/or LDLIBS in the Makefile need to be edited manually. It should however be noted that the program finishes near-instantaneously using gcc and standard libraries, so doing this purely out of performance considerations makes little sense.
+
+Usage
+=====
+A very concise help document can be obtained by passing the program the -h flag. The interactive mode referenced therein is easy-to-use, but not particularly flexible, portable or eligible for automation; experienced users probably want to try the command-line mode in conjunction with the 'xargs' UNIX tool so that they can later rerun the same jobs from a cleanly formatted configuration file. If you wish to publish results obtained with this program, don't forget to cite the information provided by passing the program the --version flag, including reference [1] above.
+
+Note that: - this program is very beta! While the interactive interface has been used routinely in the MacKerell lab since 2011, the command-line interface was added shortly before the release of version 0.9.0 , carrying a significant risk of regressions in the input parsing routines (even when using interactive mode!) Additionally, shifting the phases / reference values of the component functions such that they're centered around the initial guess phase / reference value (as explained in the section "Restraints with nonzero target" of the paper) has not been extensively tested for the case of variable-phase dihedrals and impropers. If you encounter anything suspicious, please provide feedback.
+           - the format of the input files is the same as for the MCSA fitting program described in O. Guvench, A. D. MacKerell Jr., J. Mol. Model. 2008, DOI:10.1007/s00894-008-0305-0
+
+Examples and more thorough documentation are coming soon!
+
+Feedback & contributing
+=======================
+See the file CONTRIBUTING .
+
+Copyright & license
+===================
+ Copyright (C) 2011-2015 Kenno Vanommeslaeghe
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version. Please review the
+file COPYING that you should have received along with this program;
+it contain a preamble with important information.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.

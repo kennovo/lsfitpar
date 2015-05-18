@@ -1,0 +1,12 @@
+Bug Reports
+===========
+A bug tracker will be up soon - in the meanwhile, contact me (Kenno Vanommeslaeghe; e-mail address can be looked up at the URL provided below) if you find any bugs.
+
+Contributing code and documentation changes
+===========================================
+A rough roadmap for future development can be found in the file ROADMAP . If you are interested in adding the features outlined therein - or others - the very first step is ALWAYS to contact me (Kenno Vanommeslaeghe; e-mail address can be looked up at the URL provided below). I may already be working on the feature you had in mind outside of GitHub, or at the very least have specific ideas on the easiest way to add it to the existing code base. This is especially important given that the code is currently an extreme mess and very easy to accidentally break. I'm not happy with uploading it in this state, but circumstances forced my hand. Also, I do know that this development model goes completely against a bunch of Git and FOSS good practices. This is the first time I take any of my code public, and the time I can devote to learning the ropes of the wonderful world of GitHub will be rather limited the coming few months. Please bear with me; code will get cleaned up, control flow will be untangled, variables and concepts will get descriptive names, and all the while I'll be improving my Git skills. Eventually, I do want it to be possible for anyone to pull in a well-documented bleeding-edge version of this code, start hacking away, and send me a pull request once they're satisfied with the results. That time has not come yet, but it will.
+
+Contact
+=======
+http://mackerell.umaryland.edu/~kenno/
+(Click the "look up my e-mail address" link in the top frame and enter my name - only first or last name, not both.)

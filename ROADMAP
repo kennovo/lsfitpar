@@ -1,0 +1,38 @@
+ < 0.9.1 : release test cases and documentation
+
+   0.9.1 : implement fixed-phase angles so that we can force the sum-of-the-angles rule to be satisfied. Note that this won't be optimal for the case of 2 (or 3) angles around a planar center that *both* need to be fitted. This could tenatively be solved with a more sophisticated sum-of-the-angles constraint, implemented as a "coordinate" transformation. The latter is listed under 2.0 below because it *might* be less trivial to implement; however, it may not be that bad, in which case we may want to include it in 0.9.1.
+
+   0.9.2 : overhaul the range checking features to be consistent from an end-user POV (and, by any means, less confusing from a programmer's POV; it's currently the one "critical mess" spot in a generally messy code). One of the things is that we probably want to get rid of PRESRANGE and instead properly implement something like EXTRANGE for parameters with initial guesses.
+
+>= 0.9.2 : beta-stage features & testing:
+	   - add (command-line-only) flag to perform rounding on the final K values
+	   - per-multiplicity null biases (the data structures are already there and an updated help document is in the file futurehelp)
+	   - per-multiplicity weight factors? (not equivalent to null biases! see page labeled "NEW 2" in paper notes + 1EOX results as mentioned in CVS commit message 1.20)
+	   - try concerted fits on Lei's compounds (very clean testcase)
+
+<= 1.0.0 : bugfixes and hardening such as:
+	- eliminate race condition if second line of measurement file is arbitrary string!
+	- protect special Ki/Kk for compound functions agains division by (almost) zero! Very common!
+	- in ADAPT and ABS branches, protect agains division by (almost) zero when dividing by <F|T>!
+	- make the MINIMUM range check per measurement instead of per eq group?
+	- use a different MINRANGE bonds from angles?
+	- protection against 0-folds trying to fit a randomly encountered slope and going off into outer space (see the thp test case)? This is somewhat of a problem both with and without fixed phase, but it is not clear whether there exists a good solution.
+	- some functions are missing "const" qualifiers with variables they're never going to change (which doesn't hurt as such but is really poor practice).
+
+2.0: - targeted fitting for mutiple multiplicities on same dihedral (currently only one multiplicity - commonly 2-fold)
+     - option to target forces too (no linearity problem because K remains in front in the dx derivative, but we have to read cartesian coordinates and effectively implement a rudimentary bonded force field engine)
+     - more sophisticated handling of the sum-of-the-angles rule (e.g. 2 basis functions that are deconvoluted to 2 sensinble harmonics????? Need to think about this.)
+     - built-in xargs functionality so that we can read an actual configuration file without external help?
+ 
+3.0: - refactoring of the 2/3 of the program that processes input? There's got to be a cleaner way to handle this task!
+     - advanced features that will require calling the least-squares routine iteratively:
+	* implement parameter limit (can be worked around manually)
+	* it is possible that a variable-phase harmonic is in range, but goes out of range after refitting, which currently is fatal. This can be avoided with iterative refitting. However, this problem is expected to be extremely rare in realistic situations.
+	* automatic identification of loose degrees of freedom. This could be accomplished either by doing a second run with null biases scaled x10 (or just different null biases), or by SVD. An advanced interpretation of the results of this exercise *might* enable doing an even better null bias correction factor (is the percentual response to the null bias exactly equal to the null bias, or almost exactly 1/2 , 1/3 , 1/4 , 1/6 or 1/9 ?) See also testcase_fringe testcase23dbl testcase3x3 in the testcases subdir. (can be worked around manually)
+	* Different alignment options??? See README.to_do_too and comments in source. (Cannot be worked around manually but is a challenge to implement in least-squares, though it should be possible with DGGLSE (or conceivably DGGGLM). Could be done easily in MCSA but Olgun never judged it worth the effort, implying it's most certainly not worth it for us for, at least for the time being.)
+	* if the above (2.0) proposal for the sum-of-the-angles rule cannot be done, we can still save the day by iteratively trying different angles that satisfy the sum rule in a self-consistent fashion. However, given the nature of the problem, I would be highly surprised if we have to resort to this.
+
+Unscheduled / wontfix
+=====================
+Make single precision a compilation option governed by preprocessor keywords: wontfix because we need all the precision we can get if we're going to allow subtle correction terms on top of close initial guesses; see commit message 1.27 . Besides, even without initial guesses, we do see significant numerical noise, and performance is not an issue.
+Automatic identification of maxima and minima: easy in principle, but it will inevitably pick up discontinuities caused by concatenating multiple PES ==> this task should be left to an outside script that has knowledge of the different PESes.
