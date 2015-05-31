@@ -4,7 +4,8 @@ Welcome to the lsfitpar program for robust fitting of bonded parameters. This pr
 
 Compiling
 =========
-This program depends on BLAS and LAPACK libraries as included in (among others) ATLAS, ACML, MKL, OpenBLAS,... The easiest way to install these on Debian-based Linux distributions (including the popular Linux Mint and Ubuntu) is:
+If you're reading this on the lsfitpar home page on GitHub ( https://github.com/kennovo/lsfitpar ), your first step would be to download the lsfitpar distribution by clicking on the "Download ZIP" button to your right, and to extract it into an appropriate directory.
+The lsfitpar program depends on BLAS and LAPACK libraries as included in (among others) ATLAS, ACML, MKL, OpenBLAS,... The easiest way to install these on Debian-based Linux distributions (including the popular Linux Mint and Ubuntu) is:
 $ sudo apt-get install libblas-dev liblapack-dev
 Installation on other distributions should be very analogous. If gcc is used and the libraries are installed in the standard paths, the next step is simply:
 $ make

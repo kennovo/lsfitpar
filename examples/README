@@ -1,4 +1,4 @@
-This directory contains 4 subdirectories, each illustrating a different use
+This directory contains 5 subdirectories, each illustrating a different use
 case of the lsfitpar program. Each subdirectory has its own README , containing
 the sequence of commands required to run the complete example. The user is
 invited to read the comments accompanying these commands and inspect the files
