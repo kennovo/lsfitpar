@@ -201,7 +201,7 @@ size_t gopt( const void *vptr_opts, int key ){
   return count;
 }
 
-size_t gopt_arg( const void *vptr_opts, int key, const char **arg ){
+size_t gopt_arg( const void *vptr_opts, const int key, const char **arg ){
   const opt_t *opts= vptr_opts;
   size_t count= 0;
  

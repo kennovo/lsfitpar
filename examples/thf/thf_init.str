@@ -1,0 +1,92 @@
+* Stream file with THF experiment
+*
+
+read rtf card
+* Small molecules parameterization for drug design with CHARMM
+*
+36 1
+
+MASS   257 HGA2     1.00800  ! alphatic proton, CH2
+MASS   331 CG3C52  12.01100  ! 5-mem ring aliphatic CH2 (proline CB/CG/CD, THF, deoxyribose)
+MASS   381 OG3C51  15.99940  ! 5-mem furanose ring oxygen (ether)
+
+DEFA FIRS NONE LAST NONE
+AUTO ANGLES DIHE
+
+RESI THF            0.00  ! tetrahydrofuran, kevo
+GROUP
+ATOM C1   CG3C52    0.02
+ATOM H11  HGA2      0.09
+ATOM H12  HGA2      0.09
+ATOM C2   CG3C52   -0.18 !   H41   O4  H11 
+ATOM H21  HGA2      0.09 !     \  /  \ /
+ATOM H22  HGA2      0.09 ! H42--C4   C1--H12 
+ATOM C3   CG3C52   -0.18 !       |    |
+ATOM H31  HGA2      0.09 ! H31--C3 --C2--H21 
+ATOM H32  HGA2      0.09 !     /       \
+ATOM C4   CG3C52    0.02 !   H32       H22 
+ATOM H41  HGA2      0.09
+ATOM H42  HGA2      0.09
+ATOM O4   OG3C51   -0.40
+
+BOND C1   O4   C1   C2   C2   C3   C3   C4   C4   O4 
+BOND C1   H11   C1   H12  C2  H21  C2   H22  C3   H31  C3   H32 
+BOND C4   H41   C4   H42 
+IC C1   O4    C4    C3     0.0000    0.00   45.00    0.00   0.0000
+IC C3   O4    *C4   H41    0.0000    0.00  120.00    0.00   0.0000
+IC C3   O4    *C4   H42    0.0000    0.00 -120.00    0.00   0.0000
+IC C4   O4    C1    C2     0.0000    0.00  -45.00    0.00   0.0000
+IC C2   O4    *C1   H11    0.0000    0.00  120.00    0.00   0.0000
+IC C2   O4    *C1   H12    0.0000    0.00 -120.00    0.00   0.0000
+IC C3   C1    *C2   H21    0.0000    0.00  120.00    0.00   0.0000
+IC C3   C1    *C2   H22    0.0000    0.00 -120.00    0.00   0.0000
+IC C2   C4    *C3   H31    0.0000    0.00  120.00    0.00   0.0000
+IC C2   C4    *C3   H32    0.0000    0.00 -120.00    0.00   0.0000
+END
+
+read param card flex
+* Parameters needed for new molecules
+*
+
+ATOMS
+MASS   257 HGA2     1.00800  ! alphatic proton, CH2
+MASS   331 CG3C52  12.01100  ! 5-mem ring aliphatic CH2 (proline CB/CG/CD, THF, deoxyribose)
+MASS   381 OG3C51  15.99940  ! 5-mem furanose ring oxygen (ether)
+
+BONDS
+CG3C52 HGA2    307.00     1.1000 ! THF, THF neutron diffr., 5/30/06, viv
+CG3C52 CG3C52  195.00     1.5300 ! THF, nucleotide CSD/NDB survey, 5/30/06,viv; increased to 1.53 by kevo
+CG3C52 OG3C51  350.00     1.4250 ! THF, nucleotide CSD/NDB survey, 5/30/06,viv
+
+ANGLES
+CG3C52 CG3C52 HGA2     35.00    111.40   22.53   2.179 ! TF2M, viv
+OG3C51 CG3C52 HGA2     70.00    107.30                 ! THF 10/21/05, viv
+HGA2   CG3C52 HGA2     38.50    106.80    5.40   1.802 ! THF, 10/17/05 viv
+CG3C52 CG3C52 CG3C52   58.00    109.50 ! THF, nucleotide CSD/NDB survey, 05/30/06, viv ! REMOVED U-B FOR CORRECT FIT!
+CG3C52 CG3C52 OG3C51   45.00    111.10 ! THF 10/21/05, viv
+CG3C52 OG3C51 CG3C52   95.00    111.00 ! THF 10/21/05, viv
+
+DIHEDRALS
+CG3C52 CG3C52 CG3C52 HGA2       0.1900  3     0.00 ! alkane, 4/98, yin and mackerell, thf, viv
+OG3C51 CG3C52 CG3C52 HGA2       0.1900  3     0.00 ! alkane, 4/98, yin and mackerell, thf viv
+HGA2   CG3C52 CG3C52 HGA2       0.1900  3     0.00 ! alkane, 4/98, yin and mackerell, thf, viv
+HGA2   CG3C52 OG3C51 CG3C52     0.3000  3     0.00 ! THF, 05/30/06, viv
+!CG3C52 CG3C52 CG3C52 CG3C52     0.4100  3   180.00 ! cpen, cyclopentane, viv 10/4/05
+!CG3C52 CG3C52 CG3C52 OG3C51     0.0000  3     0.00 ! THF, 05/30/06, viv
+!CG3C52 CG3C52 OG3C51 CG3C52     0.5000  3     0.00 ! THF, 05/30/06, viv
+CG3C52 CG3C52 CG3C52 CG3C52     0.0000  3   180.00 ! cpen, cyclopentane, viv 10/4/05
+CG3C52 CG3C52 CG3C52 OG3C51     0.0000  3     0.00 ! THF, 05/30/06, viv
+CG3C52 CG3C52 OG3C51 CG3C52     0.0000  3     0.00 ! THF, 05/30/06, viv
+
+NONBONDED nbxmod  5 atom cdiel fshift vatom vdistance vfswitch -
+cutnb 14.0 ctofnb 12.0 ctonnb 10.0 eps 1.0 e14fac 1.0 wmin 1.5
+HGA2     0.0       -0.0350     1.3400 ! alkane, igor, 6/05
+CG3C52   0.0       -0.0600     2.0200   0.0 -0.01 1.9 ! CPEN, cyclopentane, 8/06 viv
+OG3C51   0.0       -0.1000     1.6500 ! THF; LJ from THP, tetrahydropyran sng 1/06
+
+HBOND CUTHB 0.5  ! If you want to do hbond analysis (only), then use
+                 ! READ PARAM APPEND CARD
+                 ! to append hbond parameters from the file: par_hbond.inp
+
+END
+

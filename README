@@ -11,14 +11,21 @@ $ make
 This should produce a ready-to-run binary called lsfitpar that can be copied to a location that is part of the user's $PATH ( $HOME/bin is often a good choice). System-wide installation should be performed manually in /usr/local/bin or /opt ; we currently do not provide "make install" functionality (nor a man page or configure script).
 If a different compiler or nonstandard libraries are desired, the variables CC , CFLAGS and/or LDLIBS in the Makefile need to be edited manually. It should however be noted that the program finishes near-instantaneously using gcc and standard libraries, so doing this purely out of performance considerations makes little sense.
 
-Usage
-=====
-A very concise help document can be obtained by passing the program the -h flag. The interactive mode referenced therein is easy-to-use, but not particularly flexible, portable or eligible for automation; experienced users probably want to try the command-line mode in conjunction with the 'xargs' UNIX tool so that they can later rerun the same jobs from a cleanly formatted configuration file. If you wish to publish results obtained with this program, don't forget to cite the information provided by passing the program the --version flag, including reference [1] above.
+Documentation
+=============
+Instead of a conventional manual, the documentation of the lsfitpar program consists of 3 parts:
+	(1) The paper [1].
+	(2) A tutorial that can be found in the "examples" subdirectory; see the separate README file in that location. This tutorial guides the reader through the practical aspects of bonded parameter fitting and the different features of the lsfitpar program.
+	(3) A concise reference manual that can be obtained by passing the program the -h flag.
+It is suggested that both novice and experienced users work through all 3 parts in the above order, i.e. start with giving the paper a good read, then work through the tutorial, then use the reference manual for advanced use in application projects.
 
-Note that: - this program is very beta! While the interactive interface has been used routinely in the MacKerell lab since 2011, the command-line interface was added shortly before the release of version 0.9.0 , carrying a significant risk of regressions in the input parsing routines (even when using interactive mode!) Additionally, shifting the phases / reference values of the component functions such that they're centered around the initial guess phase / reference value (as explained in the section "Restraints with nonzero target" of the paper) has not been extensively tested for the case of variable-phase dihedrals and impropers. If you encounter anything suspicious, please provide feedback.
-           - the format of the input files is the same as for the MCSA fitting program described in O. Guvench, A. D. MacKerell Jr., J. Mol. Model. 2008, DOI:10.1007/s00894-008-0305-0
-
-Examples and more thorough documentation are coming soon!
+Important Usage Notes
+=====================
+ - If you wish to publish results obtained with this program, don't forget to cite the information provided by passing the program the --version flag, including reference [1] above.
+- The interactive mode mentioned in the reference manual is easy-to-use, but not particularly flexible, portable or eligible for automation. While it may be a welcome tool for novice users to learn what kind of input the program requires, it is suggested to use the command-line mode in conjunction with the 'xargs' UNIX tool for production calculations, so that these calculations can efficiently be debugged and reproduced by means of a cleanly formatted configuration file.
+ - This program is beta! While the interactive interface has been used routinely in the MacKerell lab since 2011, the command-line interface is a relatively new feature that was added shortly before the release of version 0.9.0, so there is a possibility of newly introduced bugs (even in interactive mode!) A prioritized list of outstanding issues and missing features can be found in the file ROADMAP . Of particular note is the fact that shifting the phases / reference values of the component functions such that they're centered around the initial guess phase / reference value (as explained in the section "Restraints with nonzero target" of the paper) has not been extensively tested in real life for the case of variable-phase dihedrals and impropers. The reason for this relative lack of testing is the fact that the use of variable-phase dihedrals and impropers is generally not recommended in all-atom force fields, as explained in the paper; this also mitigates the impact of any hypothetical issues with this functionality.
+ - More generally spoken, if you encounter anything suspicious, please provide feedback.
+ - The format of the input files is the same as for the MCSA fitting program described in [2] O. Guvench, A. D. MacKerell Jr., J. Mol. Model. 2008, DOI:10.1007/s00894-008-0305-0
 
 Feedback & contributing
 =======================
@@ -39,3 +46,8 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
+
+References
+==========
+[1] K. Vanommeslaeghe, M. Yang, A. D. MacKerell Jr., J. Comput. Chem. 2015, DOI:10.1002/jcc.23897
+[2] O. Guvench, A. D. MacKerell Jr., J. Mol. Model. 2008, DOI:10.1007/s00894-008-0305-0

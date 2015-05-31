@@ -1,0 +1,18 @@
+scan_nesm.qme scan_nesm.mme
+allfit.prm allfit.ene
+--conf-weights equal.w
+--groups nesm.groups
+--measure scan_nesm.ccns
+--measure scan_nesm.cnso11
+--measure scan_nesm.cnso12
+--measure scan_nesm.cnso13
+--measure scan_nesm.ccnh21
+--measure scan_nesm.cnh21
+--measure scan_nesm.ccn
+--measure scan_nesm.h31cn
+--measure scan_nesm.h32cn
+--measure scan_nesm.cns
+--measure scan_nesm.cn
+--parameter 'CG331  CG321  NG2S3  SG3O1' --multiplicities 12346
+--parameter 'CG321  NG2S3  SG3O1  OG2P1' --multiplicities 3
+--parameter 'CG331  CG321  NG2S3  HGP1'  --multiplicities '1 2 3'

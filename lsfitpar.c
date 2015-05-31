@@ -17,8 +17,8 @@
 
 /* ACHTUNG: Do not forget to change the version string!!! */
 const char fullname[] = "ParamChem least-squares fitting";
-const char version[] = "0.9.0 beta";
-const char reldate[] = "the 17th of May 2015";
+const char version[] = "0.9.1 beta";
+const char reldate[] = "the 31st of May 2015";
 
 #include <stdio.h>   /* duh! */
 #include <stdint.h>  /* int32_t , int64_t (not interested in pre-C99 compatibility) */
@@ -153,7 +153,7 @@ const char oobwarn[] = " fitted reference value out of acceptable range";
  * center of the scan range will be the distance from the center of the scan range to its
  * edge multiplied by a factor 1 + 2 * EXTRANGE. For example, if the user did a 3-point
  * scan with step size 3deg on an angle, a fitted phase that deviates 3 * (1 + 3) = 12
- * degrees from the center of the scan range will be accpeted. Or in other words, for a
+ * degrees from the center of the scan range will be accepted. Or in other words, for a
  * minimized QM value of 109, reference values in the 97-121 range will be accepted,
  * which sounds about right. */
 /* TODO: EXTRANGE does not get checked if an initial guess is present; in that case,
@@ -203,7 +203,8 @@ double *weighvec=NULL;        /* global for the same reason */
 int ghi;                      /* global for the same reason */
 struct eqgroup *eqgrp,*eqgmax;  /* allocated in main() and used in findgrp() listeqg() */
 struct dihedral *dih;      /* global because allocated in main() and used in listeqg() */
-fint np;  /* global because used in main() and packmult() */
+fint np;        /* global because used in main() and packmult() */
+void *options;  /* global because used in main() and outsideopt() */
 bool interact=false;
 const char helpstr[] = "Performs least-squares fit of bonded molecular mechanics parameters to\n"
 "conformational energies and corresponding measurements, applying\n"
@@ -266,7 +267,7 @@ const char helpstr[] = "Performs least-squares fit of bonded molecular mechanics
 "the 'xargs' UNIX tool as follows: xargs ./lsfitpar <lsfit_input_file\n"
 "      - If you're on a terminal that doesn't scroll and you're seeing only this\n"
 "part, consider piping the output to \"less\" or redirecting it to a file. :-P\n";
-char empty='\0';
+char empty='\0';  /* The pointer to this doubles as a sentinel value. */
 
 /* TODO LATER: eliminate more of the duplicated code */
 bool readvect (const char *filename, enum datatyp kind,
@@ -279,6 +280,7 @@ void normalize_weight (double *tvec);  /* a tad too heavy for static inlining */
 void finalize_mult (struct eqgroup *eqg, int *mult, int nmult, enum phaseflag phase);
 char packmult (int *mult, int nmult, bool phasevar);
 /* no inlining for functions that are involved in any kind of I/O (disk is not that fast) */
+const char *outsideopt (const char exact, const char fuzzy, const char *disp);
 void listeqg (FILE *unit, char *pre, struct eqgroup *eqg, int indent);
 bool promptenter (char *buf, const char *filename, enum datatyp kind,
 		void **vect, fint *dim, char *disp, char *action);
@@ -341,7 +343,7 @@ int main (int argc, const char *argv[]) {
     /* correct merging of stdout and stderr is essential */
     setvbuf(stderr, NULL, _IOLBF, BUFSIZ);
 
-    void *options= gopt_sort(&argc, argv, gopt_start(
+    options = gopt_sort(&argc, argv, gopt_start(
 	gopt_option('h', 0, gopt_shorts('h','?'), gopt_longs("help","HELP")),
 	gopt_option( 1 , 0, gopt_shorts(0), gopt_longs("version")),
     /* Verbosity not implemented yet */
@@ -467,8 +469,8 @@ int main (int argc, const char *argv[]) {
 	mme=NULL;  /* Prevent it from being freed again at the end to shut up valgrind */
 #endif
     }
-    ccp=NULL;
-    gopt_arg(options, 'w', &ccp);  /* next line: weighvec initialized to NULL above */
+    if ((ccp=outsideopt(2,'w',"file with per-conformation weight factors")) == &empty)
+	return 1;  /* next line: outsideopt() returned NULL if no weights on cmd line */
     if (promptenter(line,ccp,DOUBL,(void **) &weighvec,&ns,"weight ","weights")) return 1;
     /* Not safe: for (dpb = (dpa=weighvec) + ns; dpa < dpb; *dpa++ = sqrt(*dpa)); */
     /* A failed sqrt() sets errno but a successful one doesn't reset it. Therefore,
@@ -804,22 +806,7 @@ int main (int argc, const char *argv[]) {
 	fprintf(stderr,"ERROR: options -u, -t and --abs are mutually exclusive!\n");
 	return 1;
     }
-    ccp=NULL;
-    gopt_arg(options, 4, &ccp);
-    if (gopt (options,'b')) for (opts=options;;opts++) {
-	    switch (opts->key) {
-	      case 'b':
-		if (ccp) {
-		    fprintf(stderr,"ERROR: can't accept both -b outside "
-				"multiplicity section and --glob-bias !\n");
-		    return 1;
-		}
-		ccp=opts->arg;  /* ACHTUNG: fall through! */
-	      case 'p': case '\0': break;  /* out of swith and for */
-	      default: continue;  /* only way to repeat the loop */
-	    }
-	    break;
-	}
+    if ((ccp=outsideopt(4,'b',"global bias fraction")) == &empty) return 1;
     if (ccp) {
 	if (! sscanf(ccp,"%lf",&biasfract)) {
 	    fprintf(stderr,"ERROR: argument --glob-bias has invalid format!\n");
@@ -1930,7 +1917,7 @@ int main (int argc, const char *argv[]) {
     free(groupvec);
     free(weighvec); /* K&R APPENDIX B: "[free] does nothing if [its argument] is NULL" */
     free(mme);      /* " " */
-    free(targvec);
+    if (targvec != qme) free(targvec);
     free(qme);
 #endif  /* DEBUG */
     return 0;
@@ -1986,6 +1973,25 @@ char packmult (int *mult, int nmult, bool phasevar) {
       else np += nmult+1;
     return u;
 }
+
+const char *outsideopt (const char exact, const char fuzzy, const char *disp) {
+    const opt_t *opts;
+    const char *exitstatus=NULL;
+    char key;
+
+    gopt_arg(options, exact, &exitstatus);
+    if (! gopt(options,fuzzy)) return exitstatus; /* NULL is a valid return value */
+    for (opts=options;;opts++) {
+	switch (key=opts->key) {
+	  case 'p': case '\0': return exitstatus; /* loop's only non-error exit point */
+	}
+	if (key == fuzzy) {
+	    if (exitstatus) {
+	        fprintf(stderr,"ERROR: %s specified two or more times!\n",disp);
+	        return &empty;  /* sentinel */
+	    }
+	    exitstatus=opts->arg;
+}   }   }  /* repeat loop because we can have multiple fuzzies */
 
 void listeqg (FILE *unit, char *pre, struct eqgroup *eqg, int indent) {
     struct dihedral *dip;

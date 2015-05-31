@@ -1,0 +1,110 @@
+1
+                 Chemistry at HARvard Macromolecular Mechanics
+           (CHARMM) - Developmental Version 38b1     August 15, 2013            
+       Copyright(c) 1984-2001  President and Fellows of Harvard College
+                              All Rights Reserved
+     Current operating system: Linux-3.13.0-49-generic(x86_64)@albemarle.um     
+                 Created on  5/26/15 at 14:11:20 by user: kenno       
+
+            Maximum number of ATOMS:     25140, and RESidues:        8380
+ RDTITL> * CREATE TEMPLATE CRD FILE FOR FILLING IN COORDINATES FROM QM
+ RDTITL> *
+  
+ CHARMM>     
+  
+ CHARMM>    ioformat extended
+ MISCOM> Expanded I/O format is used.
+  
+ CHARMM>     
+  
+ CHARMM>    !### Things that should be reconsidered for every molecule ###
+ CHARMM>    set resi thf
+ Parameter: RESI <- "THF"
+  
+ CHARMM>    set bombover 0 !needs to be set to -1 for 3-membered rings
+ Parameter: BOMBOVER <- "0"
+  
+ CHARMM>     
+  
+ CHARMM>    if @?str eq 1 stream @str
+ Parameter: STR -> "THF_INIT.STR"
+ Comparing "1" and "1".
+ IF test evaluated as true.  Performing command
+ VOPEN> Attempting to open::thf_init.str::
+ OPNLGU> Unit 99 opened for READONLY access to thf_init.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * STREAM FILE WITH THF EXPERIMENT
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+ CHARMM>     
+  
+ CHARMM>    read rtf card
+ MAINIO> Residue topology file being read from unit  99.
+ RDTITL> * SMALL MOLECULES PARAMETERIZATION FOR DRUG DESIGN WITH CHARMM
+ RDTITL> *
+  
+ CHARMM>     
+  
+ CHARMM>    read param card flex
+
+          PARAMETER FILE BEING READ FROM UNIT 99
+ RDTITL> * PARAMETERS NEEDED FOR NEW MOLECULES
+ RDTITL> *
+ PARMIO> NONBOND, HBOND lists and IMAGE atoms cleared.
+  
+ CHARMM>     
+  
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+ CHARMM>     
+  
+ CHARMM>    read sequence @resi 1
+ Parameter: RESI -> "THF"
+  
+ CHARMM>     
+  
+ CHARMM>    bomlev @bombover
+ Parameter: BOMBOVER -> "0"
+  
+ CHARMM>    generate @resi first none last none setup warn
+ Parameter: RESI -> "THF"
+ NO PATCHING WILL BE DONE ON THE FIRST RESIDUE
+ NO PATCHING WILL BE DONE ON THE LAST  RESIDUE
+ GENPSF> Segment   1 has been generated. Its identifier is THF.
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        1   Number of residues   =        1
+         Number of atoms         =       13   Number of groups     =        1
+         Number of bonds         =       13   Number of angles     =       25
+         Number of dihedrals     =       33   Number of impropers  =        0
+         Number of cross-terms   =        0
+         Number of HB acceptors  =        0   Number of HB donors  =        0
+         Number of NB exclusions =        0   Total charge =    0.00000
+  
+ CHARMM>    bomlev 0
+  
+ CHARMM>     
+  
+ CHARMM>    write coor card name @resi_template.crd
+ Parameter: RESI -> "THF"
+ VOPEN> Attempting to open::thf_template.crd::
+ RDTITL>  
+ RDTITL> No title read.
+ VCLOSE: Closing unit   90 with status "KEEP"
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>     
+  
+$$$$$$  New timer profile $$$$$
+ Total time                      0.05 Other:            0.00
+
+                    NORMAL TERMINATION BY END OF FILE
+                    NO WARNINGS WERE ISSUED
+
+                    $$$$$ JOB ACCOUNTING INFORMATION $$$$$
+                     ELAPSED TIME:     0.07  SECONDS 
+                         CPU TIME:     0.01  SECONDS 

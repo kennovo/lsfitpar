@@ -1,0 +1,5 @@
+Rationale for equal weighting (after cut):
+Dihedrals: 1-85 (85) w: (139*2)/85 = 3.270588235
+Relaxed angle: 86-133 (48) w: 139/48 = 2.895833333
+Constrained angle: 134-272 (139) w: 1 (choose)
+Bonds: 273-281 (9) w: (139*2)/9 = 30.888888889

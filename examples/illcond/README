@@ -1,0 +1,6 @@
+# First generate artificial target data
+./generate_illcond.awk 
+# Use the correct path to the lsfitpar binary on the following line
+./multifit.sh ../../lsfitpar
+# The following line requires /usr/bin/gnuplot
+./illcond.gpt

@@ -1,0 +1,7 @@
+illcond.qme illcond.mme
+illcond%bias%.prm
+--glob-bias %bias%
+--measure illcond.meas1
+--measure illcond.meas2
+--parameter 'a1 b1 c1 d1' --multiplicities 1
+--parameter 'a2 b2 c2 d2' --multiplicities 1

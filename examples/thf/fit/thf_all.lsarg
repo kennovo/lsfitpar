@@ -1,0 +1,22 @@
+scan_thf.qme scan_thf.mme
+allfit.prm allfit.ene
+--conf-weights equal.w
+--target-adapted
+--measure scan_thf.ccc1o
+--measure scan_thf.ccc4o
+--measure scan_thf.cc1oc
+--measure scan_thf.cc4oc
+--measure scan_thf.cccc
+--measure scan_thf.ccc1
+--measure scan_thf.ccc4
+--measure scan_thf.c1co
+--measure scan_thf.c4co
+--measure scan_thf.coc
+--measure scan_thf.c1c2
+--measure scan_thf.c2c3
+--measure scan_thf.c3c4
+--measure scan_thf.c4o4
+--measure scan_thf.o4c1
+--parameter 'CG3C52 CG3C52 OG3C51 CG3C52' --multiplicities 34
+--parameter 'CG3C52 CG3C52 CG3C52 OG3C51' --multiplicities 3-4
+--parameter 'CG3C52 CG3C52 CG3C52 CG3C52' --multiplicities '3 4'

@@ -1,0 +1,8 @@
+#!/bin/sh
+echo SG2R50 CG2R53 SG3O2  NG321 > scan_sulfaz.scsn
+echo NG2R50 CG2R53 SG3O2  NG321 > scan_sulfaz.ncsn
+echo SG2R50 CG2R53 SG3O2  OG2P1 > scan_sulfaz.scso1
+echo NG2R50 CG2R53 SG3O2  OG2P1 > scan_sulfaz.ncso1
+echo SG2R50 CG2R53 SG3O2  OG2P1 > scan_sulfaz.scso2
+echo NG2R50 CG2R53 SG3O2  OG2P1 > scan_sulfaz.ncso2
+echo -n > scan_sulfaz.mme

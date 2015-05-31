@@ -20,7 +20,6 @@
 struct opt_s {
   int key;
   const char *arg;
-  const char *arg2;
 };
 typedef struct opt_s opt_t;
 
@@ -32,7 +31,7 @@ size_t gopt( const void *opts, int key );
 /* returns the number of times the option was specified
  * which will be 0 or 1 unless GOPT_REPEAT was used
  */
-size_t gopt_arg( const void *opts, int key, const char **arg );
+size_t gopt_arg( const void *opts, const int key, const char **arg );
 /* returns the number of times the option was specified
  * writes a pointer to the option argument from the first (or only) occurance to *arg
  */

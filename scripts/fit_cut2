@@ -1,0 +1,49 @@
+#!/bin/sh
+
+# Applies energy cutoff to qm and mm energies and associated weights/groups
+# and measurements. Run without command-line arguments for usage information.
+
+# Copyright (C) 2009 Kenno Vanommeslaeghe
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+if [ $# -lt 4 ] ; then
+	echo "Usage: `basename $0` <cutoff> <qm file> <mm file> <weight/group file> [<angle file(s)>]
+Warning! All specified files will be overwritten!"
+  exit 1
+ fi
+cutoff=$1
+qmfile=$2
+mmfile=$3
+wfile=$4
+shift 4
+echo $* | awk -v cut=$cutoff -v qmf=$qmfile -v mmf=$mmfile -v wwf=$wfile 'BEGIN{nang=0}
+ {for (i=1;i<=NF;i++) angfile[++nang]=$i}
+# Read and verify data
+  END{npoint=0;absmin=32000;
+    while (getline < qmf) {x=$1;qme[++npoint]=x;if(x<absmin) absmin=x};
+    x=0;while (getline < mmf) mme[++x]=$1;if (x!=npoint) exit 3;
+    x=0;while (getline < wwf) weight[++x]=$1;if (x!=npoint) exit 3;
+    for(i=1;i<=nang;i++){angf=angfile[i];getline < angf;head[i]=$0;x=0;
+      while (getline < angf) ang[i,++x]=$1;if (x!=npoint) exit 3}
+# Filter and write data
+    for(i=1;i<=nang;i++) print head[i] > angfile[i];
+    for(i=1;i<=npoint;i++) {qmi=qme[i]; if (qmi-absmin < cut) {
+        print qmi > qmf; print mme[i] > mmf;
+	print weight[i] > wwf;
+        for(j=1;j<=nang;j++) print ang[j,i] > angfile[j] } } }'
+if [ $? -eq 3 ] ; then
+  echo "Error: files are different lenghts! No changes made."
+  exit 3
+ fi

@@ -1,0 +1,27 @@
+### Generate template for extraction of QM data.
+## If you don't have CHARMM, you can do the following instead:
+# cp -p charmmout/* .
+charmm str:toppar/acazam_sulfaz_zerodih.str -i generate_template.inp -o generate_template.out
+
+### Extract conformations from Gaussian .log file
+cd scandih
+../../../scripts/scan2cat_gauss sulfaz_scan.log
+../../../scripts/c2s_file ../sulfaz_template.crd sulfaz_scan.c_file sulfaz_scan.e_file
+cp -p sulfaz_scan.e_file ../fit_dih/scan_sulfaz.qme
+cd ..
+
+### Run MM scan with CHARMM
+cd fit_dih
+. ./initialize
+## If you don't have CHARMM, you can do the following instead:
+# gunzip -c charmmout.tgz | tar xf -
+charmm str:../toppar/acazam_sulfaz_zerodih.str -i allscan.inp -o allscan.out
+
+### Actual fitting (in same directory; use the correct path to the lsfitpar binary)
+xargs ../../../lsfitpar >sulfaz_all.ou <sulfaz_all.lsarg
+
+### Inspect output
+cat allfit.prm
+
+### Plot results - requires /usr/bin/gnuplot
+../../../scripts/fitplot allfit.ene

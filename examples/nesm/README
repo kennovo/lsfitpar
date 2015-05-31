@@ -1,0 +1,8 @@
+### Actual fitting
+xargs ../../lsfitpar >nesm_all.ou <nesm_all.lsarg
+
+### Inspect output
+cat allfit.prm
+
+### Plot results - requires /usr/bin/gnuplot
+../../scripts/fitplot allfit.ene

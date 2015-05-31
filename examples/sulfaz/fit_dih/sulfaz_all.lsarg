@@ -1,0 +1,13 @@
+scan_sulfaz.qme scan_sulfaz.mme
+allfit.prm allfit.ene
+--uniform --glob-bias 0.02
+--measure scan_sulfaz.scsn
+--measure scan_sulfaz.ncsn
+--measure scan_sulfaz.scso1
+--measure scan_sulfaz.ncso1
+--measure scan_sulfaz.scso2
+--measure scan_sulfaz.ncso2
+--parameter 'SG2R50 CG2R53 SG3O2 NG321' --multiplicities '1 2 3 4 6'
+--parameter 'NG2R50 CG2R53 SG3O2 NG321' --multiplicities 12346
+--parameter 'SG2R50 CG2R53 SG3O2 OG2P1' --multiplicities '3 6'
+--parameter 'NG2R50 CG2R53 SG3O2 OG2P1' --multiplicities 36

@@ -1,0 +1,234 @@
+* Potential energy scan
+* 
+
+ioformat extended
+
+set resi thf
+set bombover 0 !needs to be set to -1 for 3-membered rings, otherwise 0
+set basnam scan_@resi
+set pesbas ..
+set peses 6
+set pes1 dihscan
+set pes2 angscan_rel
+set pes3 angscan_con
+set pes4 bscan12
+set pes5 bscan23
+set pes6 bscan41
+! We want to constrain 9 DOF (5 bonds, 2 angles, 2 dihedrals) but measure evarything
+set conds 2
+set cond1 1 C3 1 C2 1 C1 1 O4
+set cond2 1 C2 1 C3 1 C4 1 O4
+set meads 5
+set mead1 1 C3 1 C2 1 C1 1 O4
+set medf1 @basnam.ccc1o
+set mead2 1 C2 1 C3 1 C4 1 O4
+set medf2 @basnam.ccc4o
+set mead3 1 C2 1 C1 1 O4 1 C4
+set medf3 @basnam.cc1oc
+set mead4 1 C3 1 C4 1 O4 1 C1
+set medf4 @basnam.cc4oc
+set mead5 1 C1 1 C2 1 C3 1 C4
+set medf5 @basnam.cccc
+set conas 2
+set coam1 1 C1 1 C2 1 C3
+!set cona1 sele atom * * C1 end sele atom * * C2 end sele atom * * C3 end
+set cona1 sele bynu 1 end sele bynu 4 end sele bynu 7 end
+set coam2 1 C2 1 C3 1 C4
+set cona2 sele bynu 4 end sele bynu 7 end sele bynu 10 end
+set meaas 5
+set meaa1 1 C1 1 C2 1 C3
+set meaf1 @basnam.ccc1
+set meaa2 1 C2 1 C3 1 C4
+set meaf2 @basnam.ccc4
+set meaa3 1 O4 1 C1 1 C2
+set meaf3 @basnam.c1co
+set meaa4 1 C3 1 C4 1 O4
+set meaf4 @basnam.c4co
+set meaa5 1 C4 1 O4 1 C1
+set meaf5 @basnam.coc
+set conbs 5
+set cobm1 1 C1 1 C2
+set conb1 sele bynu 1 end sele bynu 4 end
+set cobm2 1 C2 1 C3
+set conb2 sele bynu 4 end sele bynu 7 end
+set cobm3 1 C3 1 C4
+set conb3 sele bynu 7 end sele bynu 10 end
+set cobm4 1 C4 1 O4
+set conb4 sele bynu 10 end sele bynu 13 end
+set cobm5 1 O4 1 C1
+set conb5 sele bynu 13 end sele bynu 1 end
+set meabs 5
+set meab1 1 C1 1 C2
+set mebf1 @basnam.c1c2
+set meab2 1 C2 1 C3
+set mebf2 @basnam.c2c3
+set meab3 1 C3 1 C4
+set mebf3 @basnam.c3c4
+set meab4 1 C4 1 O4
+set mebf4 @basnam.c4o4
+set meab5 1 O4 1 C1
+set mebf5 @basnam.o4c1
+
+!set TOPPAR ../toppar
+!read rtf card name @TOPPAR/top_all36_cgenff.rtf
+!read para card flex name @TOPPAR/par_all36_cgenff.prm
+if @?str eq 1 stream @str
+
+set offset 21
+set mun @offset
+if @meads ne 0 then
+  set meadc 1
+  label loop_medf
+    open unit @mun append form name @medf@@meadc
+   incr mun
+   incr meadc
+   if @meadc le @meads goto loop_medf
+ endif
+if @meaas ne 0 then
+  set meaac 1
+  label loop_meaf
+    open unit @mun append form name @meaf@@meaac
+   incr mun
+   incr meaac
+   if @meaac le @meaas goto loop_meaf
+  calc mgeo = @conas * 3
+ endif
+if @meabs ne 0 then
+  set meabc 1
+  label loop_mebf
+    open unit @mun append form name @mebf@@meabc
+   incr mun
+   incr meabc
+   if @meabc le @meabs goto loop_mebf
+ endif
+
+open unit 9 append form name @basnam.mme
+open unit 10 write form name ini_geom.pdb
+open unit 11 write form name fin_geom.pdb
+
+read sequence @resi 1
+
+bomlev @bombover
+generate @resi first none last none setup warn
+bomlev 0
+
+!  patch @resi @resi 1 setup warn
+!  autogenerate angles dihedral
+
+set scan 1
+label loop_scan
+set pesdir @pesbas/@pes@@scan
+open unit 12 read form name @pesdir/s_file.txt
+
+label loop_pes
+get crdnam unit 12
+if "@CRDNAM" eq "END-OF-FILE" goto nextscan
+if "@CRDNAM" eq "" goto nextscan
+read coor card name @pesdir/@crdnam
+
+write coor pdb unit 10
+
+if @conds ne 0 then
+  set cond 1
+  label loop_cond
+    cons dihe @cond@@cond FORCE 9999. MAIN PERIOD 0
+    incr cond
+   if @cond le @conds goto loop_cond
+ endif
+! Work around mmfp bug
+if @conas ne 0 then
+  quick @coam1
+  mmfp
+  geo maxgeo @mgeo sphere angle harmonic symmetric force 9999. tref ?thet dtoff 0.0 @cona1
+  end
+ endif
+if @conas gt 1 then
+  set cona 2
+  label loop_cona
+    quick @coam@@cona
+    !don't know whether it's better to specify RCM or not if each selection is 1 atom
+    mmfp
+    geo sphere angle harmonic symmetric force 9999. tref ?thet dtoff 0.0 @cona@@cona
+    end
+   incr cona
+   if @cona le @conas goto loop_cona
+ endif
+if @conbs ne 0 then
+  set conb 1
+  label loop_conb
+    quick @cobm@@conb
+    ! was: ASSIgn @conb@@conb KMIN 99999. RMIN ?dist KMAX 99999. RMAX ?dist
+    noe
+    ASSIgn @conb@@conb KMIN 99999. RMIN ?dist KMAX 99999. RMAX ?dist FMAX 99999.
+    end
+   incr conb
+   if @conb le @conbs goto loop_conb
+ endif
+
+MINI SD nstep 100 nprint 50 inbfrq 1000 cutnb 999. bycu tolgrd 0.2
+!MINI CONJ nstep 1200 nprint 20 tolgrd 0.0001
+MINI CONJ nstep 300 nprint 20 tolgrd 0.0001
+! When restraining angles, we need to choose NSTEp and TOLGrd wisely if we want NRAP
+! to converge, but when also restraining bonds, NRAP simply becomes pathological.
+! Regardless of the algorithm, bond restraints proved too rough for TOLGrd 0.00001 .
+if ?grms gt 0.0001 MINI NRAP nstep 100 tolgrd 0.0001
+if ?grms gt 0.0001 then
+  echu
+  echo FATAL ERROR: MINIMIZATION NOT CONVERGED
+  stop
+ endif
+
+write coor pdb unit 11
+
+cons cldh
+if @conas gt 1 then
+  mmfp
+  geo reset
+  end
+ endif
+noe
+reset
+end
+echu 9
+energy
+echo ?ener
+
+set mun @offset
+if @meads ne 0 then
+  set meadc 1
+  label loop_mead
+    echu @mun
+    quick @mead@@meadc
+    echo ?phi
+   incr mun
+   incr meadc
+   if @meadc le @meads goto loop_mead
+ endif
+if @meaas ne 0 then
+  set meaac 1
+  label loop_meaa
+    echu @mun
+    quick @meaa@@meaac
+    echo ?thet
+   incr mun
+   incr meaac
+   if @meaac le @meaas goto loop_meaa
+ endif
+if @meabs ne 0 then
+  set meabc 1
+  label loop_meab
+    echu @mun
+    quick @meab@@meabc
+    echo ?dist
+   incr mun
+   incr meabc
+   if @meabc le @meabs goto loop_meab
+ endif
+
+goto loop_pes
+
+label nextscan
+close unit 12
+incr scan
+if @scan le @peses goto loop_scan
+

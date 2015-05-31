@@ -1,0 +1,22 @@
+* Create template crd file for filling in coordinates from QM
+* 
+
+ioformat extended
+
+!### Things that should be reconsidered for every molecule ###
+set resi sulfaz
+set bombover 0 !needs to be set to -1 for 3-membered rings
+
+set  TOPPAR toppar
+read rtf card name @TOPPAR/top_all36_cgenff.rtf
+read para card flex name @TOPPAR/par_all36_cgenff.prm
+if @?str eq 1 stream @str
+
+read sequence @resi 1
+
+bomlev @bombover
+generate @resi first none last none setup warn
+bomlev 0
+
+write coor card name @resi_template.crd
+

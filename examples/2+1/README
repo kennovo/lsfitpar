@@ -1,0 +1,8 @@
+# First generate artificial target data
+./generate_3x3.awk
+# Use the correct path to the lsfitpar binary on the following lines
+xargs ../../lsfitpar >2+1_hibias_uniform.ou <2+1_hibias_uniform.lsarg
+cat 2+1_hibias_uniform.prm
+xargs ../../lsfitpar >2+1_hibias_target-adapted.ou <2+1_hibias_target-adapted.lsarg
+cat 2+1_hibias_target-adapted.prm
+

@@ -1,0 +1,18 @@
+basnam=scan_thf
+echo CG3C52 CG3C52 CG3C52 OG3C51 > $basnam.ccc1o
+echo CG3C52 CG3C52 CG3C52 OG3C51 > $basnam.ccc4o
+echo CG3C52 CG3C52 OG3C51 CG3C52 > $basnam.cc1oc
+echo CG3C52 CG3C52 OG3C51 CG3C52 > $basnam.cc4oc
+echo CG3C52 CG3C52 CG3C52 CG3C52 > $basnam.cccc
+# "Initial guesses" (=restraint targets) here!!!
+echo CG3C52 CG3C52 CG3C52 58.00 109.50 > $basnam.ccc1
+echo CG3C52 CG3C52 CG3C52 58.00 109.50 > $basnam.ccc4
+echo CG3C52 CG3C52 OG3C51 45.00 111.10 > $basnam.c1co
+echo CG3C52 CG3C52 OG3C51 45.00 111.10 > $basnam.c4co
+echo CG3C52 OG3C51 CG3C52 95.00 111.00 > $basnam.coc
+echo CG3C52 CG3C52 195.00 1.5300 > $basnam.c1c2
+echo CG3C52 CG3C52 195.00 1.5300 > $basnam.c2c3
+echo CG3C52 CG3C52 195.00 1.5300 > $basnam.c3c4
+echo CG3C52 OG3C51 350.00 1.4250 > $basnam.c4o4
+echo CG3C52 OG3C51 350.00 1.4250 > $basnam.o4c1
+echo -n > $basnam.mme

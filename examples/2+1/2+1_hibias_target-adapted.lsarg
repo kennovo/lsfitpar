@@ -1,0 +1,9 @@
+3x3.qme 3x3.mme
+2+1_hibias_target-adapted.prm 2+1_hibias_target-adapted.ene
+--target-adapted --glob-bias 0.1
+--measure 3x3.meas1
+--measure 3x3.meas2
+--measure 3x3.meas3
+--parameter 'a1 b1 c1 d1' --multiplicities 3
+--parameter 'a2 b2 c2 d2' --multiplicities 3
+--parameter 'a3 b3 c3 d3' --equivalent-to 'a2 b2 c2 d2'

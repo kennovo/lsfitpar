@@ -1,0 +1,38 @@
+#!/bin/sh
+if [ $# = 1 ] ; then
+  c_file=c_file.txt
+  e_file=e_file.txt
+ elif [ $# = 3 ] ; then
+  c_file="$2"
+  e_file="$3"
+ else
+  echo "Usage: `basename $0` <template crd> [<c_file> <e_file>]
+If <c_file> and <e_file> are not specified, they are assumed to
+be c_file.txt and e_file.txt , respectively." >&2
+  exit 1
+ fi
+# Test this because c_file.txt and e_file.txt are nontrivial assumptions
+for i in "$1" "$c_file" "$e_file" ; do
+  if [ ! -s "$i" ] ; then
+    echo "ERROR: $i not found or size 0!" >&2
+    exit 1
+   fi
+ done
+
+mkdir -p crd
+awk -v efn="$e_file" -v crd="$1" 'BEGIN{while (getline < crd && substr($0,1,1)=="*");
+    head=$0; while (getline < crd && NF==10){a[++n]=$1;b[n]=$2;c[n]=$3;d[n]=$4;e[n]=$8;f[n]=$9;g[n]=$10};
+    i=32000}
+  { if (NF==3) {x=$1;y=$2;z=$3}
+     else if (NF==4) {x=$2;y=$3;z=$4}
+     else {print "Error: invalid number of fields in file with concatenated conformations";exit 1};
+    if (i>n){if (fnam){close(fnam);print fnam > "s_file.txt"};
+      i=1;fnam = "crd/" ++nam ".crd";print head > fnam};
+    printf("%10i%10i  %-10s%-8s%20.10f%20.10f%20.10f  %-5s%6i       %20.10f\n",
+a[i],b[i],c[i],d[i],x,y,z,e[i],f[i],g[i++]) > fnam}
+  END{if (i != n+1) {print "Error: invalid number of lines in file with concatenated conformations";exit 1};
+    for(i=1;i<=nam;i++) {
+      if (! getline < efn){print "Error: file with concatenated energies too short";exit 1};
+      if (NF != 1) {print "Error: invalid number of fields in file with concatenated energies";exit 1} };
+    while (getline < efn) if (NF != 0){print "Error: file with concatenated energies too long";exit 1}
+    printf ("%s\n\n",fnam) > "s_file.txt"}' $c_file >&2

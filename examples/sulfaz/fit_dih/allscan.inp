@@ -1,0 +1,109 @@
+* Potential energy scan
+* 
+
+ioformat extended
+
+set resi sulfaz
+set bombover 0 !needs to be set to -1 for 3-membered rings
+set basnam scan_@resi
+set pesbas ..
+set peses 1
+set pes1 scandih
+set cons 1
+set con1 1 S5 1 C4 1 S9 1 N10
+set meas 6
+set mea1 1 S5 1 C4 1 S9 1 N10
+set mef1 @basnam.scsn
+set mea2 1 N3 1 C4 1 S9 1 N10
+set mef2 @basnam.ncsn
+set mea3 1 S5 1 C4 1 S9 1 O91
+set mef3 @basnam.scso1
+set mea4 1 N3 1 C4 1 S9 1 O91
+set mef4 @basnam.ncso1
+set mea5 1 S5 1 C4 1 S9 1 O92
+set mef5 @basnam.scso2
+set mea6 1 N3 1 C4 1 S9 1 O92
+set mef6 @basnam.ncso2
+
+set TOPPAR ../toppar
+read rtf card name @TOPPAR/top_all36_cgenff.rtf
+read para card flex name @TOPPAR/par_all36_cgenff.prm
+if @?str eq 1 stream @str
+
+if @meas eq 0 goto end_meas
+set offset 21
+set mead 1
+set mun @offset
+label loop_meaf
+open unit @mun append form name @mef@@mead
+incr mun
+incr mead
+if @mead le @meas goto loop_meaf
+label end_meas
+
+open unit 9 append form name @basnam.mme
+open unit 10 write form name ini_geom.pdb
+open unit 11 write form name fin_geom.pdb
+
+read sequence @resi 1
+
+bomlev @bombover
+generate @resi first none last none setup warn
+bomlev 0
+
+!  patch @resi @resi 1 setup warn
+!  autogenerate angles dihedral
+
+set scan 1
+label loop_scan
+set pesdir @pesbas/@pes@@scan
+open unit 12 read form name @pesdir/s_file.txt
+
+label loop_pes
+get crdnam unit 12
+if "@CRDNAM" eq "END-OF-FILE" goto nextscan
+if "@CRDNAM" eq "" goto nextscan
+read coor card name @pesdir/@crdnam
+
+write coor pdb unit 10
+
+set cond 1
+label loop_cond
+cons dihe @con@@cond FORCE 9999. MAIN PERIOD 0
+incr cond
+if @cond le @cons goto loop_cond
+
+MINI CONJ nstep 50 nprint 20 inbfrq 1000 cutnb 999. bycu tolgrd 0.0001
+MINI NRAP nstep 100 tolgrd 0.00001
+if ?grms gt 0.00001 then
+  echu
+  echo FATAL ERROR: MINIMIZATION NOT CONVERGED
+  stop
+ endif
+
+write coor pdb unit 11
+
+echu 9
+cons cldh
+energy
+echo ?ener
+
+if @meas eq 0 goto loop_pes
+
+set mead 1
+set mun @offset
+label loop_mead
+echu @mun
+quick @mea@@mead
+echo ?phi
+incr mun
+incr mead
+if @mead le @meas goto loop_mead
+
+goto loop_pes
+
+label nextscan
+close unit 12
+incr scan
+if @scan le @peses goto loop_scan
+

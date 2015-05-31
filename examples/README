@@ -1,0 +1,152 @@
+This directory contains 4 subdirectories, each illustrating a different use
+case of the lsfitpar program. Each subdirectory has its own README , containing
+the sequence of commands required to run the complete example. The user is
+invited to read the comments accompanying these commands and inspect the files
+involved; they are all human-readable ASCII text files. Most of the examples
+rely on scripts that are located in the ../scripts directory; it is hoped that
+these tools will be useful when running production calculations. Additionally,
+the examples contain invocations of CHARMM and gnuplot , assuming both are
+installed in $PATH . If not, the reader can easily modify the command lines as
+to read these programs from the correct locations. Since not all our users have
+access to CHARMM, pre-calculated CHARMM outputs are provided so that the reader
+can simulate the CHARMM run by instead running the commented-out commands
+starting with "cp" or "gunzip". Ports of the CHARMM scripts to other MM
+programs are welcome for inclusion in future releases; please contact Kenno
+Vanommeslaeghe if you have made a faithful port.
+
+Side note: the README files in the subdirectories are formatted as
+Bourne-/POSIX-compatible shell scripts. Therefore, provided that all the
+necessary 3rd party programs (CHARMM, gnuplot,...) are in $PATH , it is
+possible to "cd" into the subdirectories and execute them as following:
+. ./README  # in a Bourne-/POSIX-compatible shell such as bash, zsh, ksh,..
+sh README   # in an incompatible shell such as csh, tcsh,...
+While doing so largely defeats the purpose of these learning examples, it may
+be useful as a limited automated testcase.
+
+illcond
+=======
+This example reproduces the case study "A typical ill-conditioned pair of
+dihedrals" in the paper: [1] K. Vanommeslaeghe, M. Yang, A. D. MacKerell Jr.,
+J. Comput. Chem. 2015, DOI:10.1002/jcc.23897 . An awk script generates the
+virtual target data and measurements, then lsfitpar is invoked 27 times by the
+custom shell script multifit.sh , which also extracts the amplitudes K from the
+resulting parameter files. Finally, the plot in the paper is reproduced using
+gnuplot .
+
+2+1
+===
+This example reproduces the case study "2+1 dihedrals around the same rotatable
+bond" in the paper [1]. Again, an awk script generates the idealized target
+data and measurements. This time, 2 lsfitpar runs are started from the
+command-line with different bias formulae, showing the difference in output
+parameters as discussed in the paper. This is also the only example
+illustrating the --equivalent-to feature. Specifically, in a technically
+realistic use case, two of the measurements would have the same atom types in
+the first line of their measurement files, but for the sake of illustration,
+these two measurement have different atom types here, and the lsfitpar program
+is instructed a posteriori to regard them as equivalent with the
+--equivalent-to flag. To obtain the aforementioned realistic use case, it would
+suffice to change the first line of 3x3.meas3 to "a2 b2 c2 d2" and remove the
+last line from the .lsarg files.  Doing so results in exactly the same fit in a
+purely mathematical sense, though the output and its meaning is subtly
+different. An excellent real-life illustration of "2+1 dihedrals around the
+same rotatable bond" is provided in the "sulfaz" example below. Finally, it
+should be noted that we deliberately used an unrealistically high bias fraction
+(10%) to demonstrate the power of the bias compensation. This is again for the
+sake of illustration; in real use cases, such a high bias fraction may lead to
+a too coarse reproduction of the target energy profile. See the paper [1] for
+more info.
+
+sulfaz
+======
+Here, the 5-sulfamoyl-1,3,4-thiadiazol-2-yl ("SULFAZ") example in the CGenFF
+tutorial is revisited. This tutorial was first presented at CECAM's June 2012
+"Advances in Biomolecular Modelling and Simulations using CHARMM" workshop:
+http://www.cecam.org/workshop-5-805.html ; its files can also be downloaded
+from the CGenFF download page:
+http://mackerell.umaryland.edu/~kenno/cgenff/download.shtml#tutor . In pages
+98-102 of the tutorial slide show (available at the same locations), the manual
+fitting of the dihedral of interest in sulfaz is demonstrated. In the present
+example, we automate this fit using lsfitpar . The procedure in the README
+starts from a QM scan and ends with producing a parameter file and predicted
+energy profile. Of note is how close lsfitpar's parameters are to the manually
+fitted ones. This is not a trivial result; MCSA fitting requires significant
+post-processing to obtain similarly transferably-looking parameters, and even
+lsfitpar itself yields non-optimal results when using the target-adapted bias
+(data not shown but straightforward to generate), as discussed in the section
+"2+1 dihedrals around the same rotatable bond" in the paper and the example
+"2+1" above. Likewise, to obtain this favorable balance between the different
+parameters around the same rotatable bond, it was necessary to increase the
+bias fraction to 2% (the default is 0.1%, and in real-life cases, the most
+optimal results are usually obtained somewhere in the 0.1%-3% range). The
+lsfitpar-predicted "mme" profile is all but identical to the one on slide 102
+of the tutorial, especially considering that the former is RMS aligned while
+the latter is aligned to zero. A slightly closer fit to the QM data can be
+obtained with a lower bias fraction, but this minuscule gain is not worth the
+sacrifice in transferability of the parameters, and would indeed amount to
+(mild) overfitting. Also note that the "mm0" profile in gnuplot differs
+substantially from the initial guess on slide 98. This highlights the
+importance of differentiating between an "initial guess" (MM(init)) and a
+"zeroed" (MM0) profile. The former (featured in the slide show) is what one
+would get by directly applying the force field generated by cgenff.paramchem.org
+without optimization and is therefore a relevant baseline against which to
+measure the improvement obtained with lsfitpar, while the latter (mm0 in
+gnuplot) is an artificial profile with the parameters of interest set to zero
+so that lsfitpar can fill them in correctly, and has no scientific relevance.
+Finally, this example illustrates the first principle of parameter fitting:
+/--------------------------------------------------------\
+| ANY ROTATABLE BOND IN THE MOLECULE NEEDS TO BE SCANNED |
+| IN THE QM AND CONSTRAINED IN THE MM ONLY ONCE, EVEN IF |
+| MULTIPLE DIHEDRAL PARAMETERS OF INTEREST APPLY TO IT!  |
+\--------------------------------------------------------/
+
+thf
+===
+This example reproduces the case study "Tetrahydrofuran" in the paper [1].
+After decompressing the QM target data, it follows roughly the same workflow as
+sulfaz, except that there are now multiple scans, some of which involve angles
+and bonds. Accordingly, there is an extra step were the individual QM energy
+files are concatenated, and a substantially more complicated variant of the
+CHARMM script "allscan.inp" is used. Since some of the scans - especially the
+constrained angle scan - visit points that are undesirably high in energy from
+a thermal point of view, a cutoff of 12 kcal/mol is applied to the target data
+using the script fit_cut . As explained in the paper [1], a weight file is
+specified in thf_all.lsarg . Multiplicities are specified for the three
+dihedral parameters, but the bond and angle parameters are not mentioned; this
+means they will receive default treatment. Note that in a future version (at
+the time of writing, we're targeting version 0.9.2), no default treatment for
+the angles will be provided, and the .lsarg file will need to specify
+explicitly whether their reference values are allowed to deviate from the
+corresponding values supplied as an initial guess. The "Adapted" fit in table 2
+in the paper [1] is exactly reproduced; reproducing the two other fits in the
+table is left as an exercise for the reader. This example illustrates two more
+principles of parameter fitting:
+/------------------------------------------------------------\
+| FOR EACH PARAMETER TO BE FIT, *ALL* ITS OCCURRENCES IN THE |
+| MOLECULE NEED TO BE MEASURED, EVEN IF THE DF CORRESPONDING |
+| TO THOSE OCCURRENCES ARE NOT BEING SCANNED THEMSELVES.     |
+\------------------------------------------------------------/
+/----------------------------------------------------------------------------\
+| *ALL* DF THAT ARE MEASURED ALSO NEED TO BE CONSTRAINED, *EXCEPT* WHEN THIS |
+| LEADS TO OVERCONSTRAINING. FOR EXAMPLE, PER THE FIRST PRINCIPLE, A         |
+| ROTATABLE BOND SHOULD NEVER BE CONSTRAINED MORE THAN ONCE, WITH THE        |
+| POSSIBLE EXCEPTIONS OF BONDS TO NITROGENS AND (PARTIAL) DOUBLE BONDS. MORE |
+| GENERALLY, IN CASE OF OVERCONSTRAINING, THE SET OF CONSTRAINTS NEEDS TO BE |
+| REEVALUATED CAREFULLY TO MINIMIZE THE RESULTING ISSUES WHILE RETAINING     |
+| RELEVANT MEASUREMENTS. THIS CAN GET NONTRIVIAL, ESPECIALLY FOR RINGS.      |
+\----------------------------------------------------------------------------/
+
+nesm
+====
+Here, the case study "N-ethylsulfamate." in the paper [1] is reproduced. In the
+interest of time, pre-processed QM and MM scan results and measurements are
+provided, and only the actual parameter fitting is performed. This example was
+mainly included to demonstrate the use of the --groups flag and its role in the
+standard parametrization procedure proposed in the paper, i.e. using a group of
+relaxed QM scans for the dihedrals and a second group of constrained QM scans
+for the bonds and angles, with a large energy offset between the two.
+
+Reference
+=========
+[1] K. Vanommeslaeghe, M. Yang, A. D. MacKerell Jr., J. Comput. Chem. 2015,
+DOI:10.1002/jcc.23897

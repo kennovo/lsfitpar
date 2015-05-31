@@ -1,0 +1,9 @@
+#!/usr/bin/gnuplot
+set logscale x
+set xrange[5e-9:5e-1]
+set format x '5E%T'
+set xtics 5e-9,10
+set xlabel "Bias fraction"
+set ylabel "Dihedral amplitude / (kcal/mol)"
+plot "illcond.k" using 1:2 with linespoints t "Dihedral a" lw 2, "illcond.k" using 1:3 with linespoints t "Dihedral b" lw 2
+pause mouse

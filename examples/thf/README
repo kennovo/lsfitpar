@@ -1,0 +1,48 @@
+### Generate template for extraction of QM data.
+## If you don't have CHARMM, you can do the following instead:
+# cp -p charmmout/* .
+charmm str:thf_init.str -i generate_template.inp -o generate_template.out
+
+### Uncompress Gaussian 2D scans (compressed to save space)
+gunzip -c scans.tgz | tar xf -
+
+### Extract conformations from Gaussian .log file
+cd dihscan
+../../../scripts/scan2cat_gauss thf_dihscan.log
+../../../scripts/c2s_file ../thf_template.crd thf_dihscan.c_file thf_dihscan.e_file
+cd ../angscan_rel
+../../../scripts/scan2cat_gauss thf_angscan_rel.log
+../../../scripts/c2s_file ../thf_template.crd thf_angscan_rel.c_file thf_angscan_rel.e_file
+cd ../angscan_con
+../../../scripts/scan2cat_gauss thf_angscan_con.log
+../../../scripts/c2s_file ../thf_template.crd thf_angscan_con.c_file thf_angscan_con.e_file
+cd ../bscan12
+../../../scripts/scan2cat_gauss thf_bscan12.log
+../../../scripts/c2s_file ../thf_template.crd thf_bscan12.c_file thf_bscan12.e_file
+cd ../bscan23
+../../../scripts/scan2cat_gauss thf_bscan23.log
+../../../scripts/c2s_file ../thf_template.crd thf_bscan23.c_file thf_bscan23.e_file
+cd ../bscan41
+../../../scripts/scan2cat_gauss thf_bscan41.log
+../../../scripts/c2s_file ../thf_template.crd thf_bscan41.c_file thf_bscan41.e_file
+cd ..
+cat dihscan/thf_dihscan.e_file angscan_rel/thf_angscan_rel.e_file angscan_con/thf_angscan_con.e_file bscan12/thf_bscan12.e_file bscan23/thf_bscan23.e_file bscan41/thf_bscan41.e_file >fit/scan_thf.qme.uncut
+
+### Run MM scan with CHARMM
+cd fit
+. ./initialize
+## If you don't have CHARMM, you can do the following instead:
+# gunzip -c charmmout.tgz | tar xf -
+charmm str:../thf_init.str -i allscan.inp -o allscan.out
+
+### Apply energy cutoff (in same directory)
+cp -p scan_thf.qme.uncut scan_thf.qme
+../../../scripts/fit_cut 12 scan_thf.qme scan_thf.mme scan_thf.c* scan_thf.o4c1
+
+### Actual fitting (in same directory; use the correct path to the lsfitpar binary)
+xargs ../../../lsfitpar >thf_all.ou <thf_all.lsarg
+
+### Inspect output
+cat allfit.prm
+## Reproduction of the other THF data in the paper as well as further analysis
+## and graphing are left as an exercise for the reader.
