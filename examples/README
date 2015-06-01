@@ -1,18 +1,24 @@
-This directory contains 5 subdirectories, each illustrating a different use
-case of the lsfitpar program. Each subdirectory has its own README , containing
-the sequence of commands required to run the complete example. The user is
-invited to read the comments accompanying these commands and inspect the files
-involved; they are all human-readable ASCII text files. Most of the examples
-rely on scripts that are located in the ../scripts directory; it is hoped that
-these tools will be useful when running production calculations. Additionally,
-the examples contain invocations of CHARMM and gnuplot , assuming both are
-installed in $PATH . If not, the reader can easily modify the command lines as
-to read these programs from the correct locations. Since not all our users have
-access to CHARMM, pre-calculated CHARMM outputs are provided so that the reader
-can simulate the CHARMM run by instead running the commented-out commands
-starting with "cp" or "gunzip". Ports of the CHARMM scripts to other MM
-programs are welcome for inclusion in future releases; please contact Kenno
-Vanommeslaeghe if you have made a faithful port.
+
+                BONDED PARAMETER FITTING USING LSFITPAR
+
+Introduction
+============
+Welcome to the lsfitpar tutorial. This directory contains 5 subdirectories,
+each illustrating a different use case of the lsfitpar program. Each
+subdirectory has its own README , containing the sequence of commands required
+to run the complete example. The user is invited to read the comments
+accompanying these commands and inspect the files involved; they are all
+human-readable ASCII text files. Most of the examples rely on scripts that are
+located in the ../scripts directory; it is hoped that these tools will be
+useful when running production calculations. Additionally, the examples contain
+invocations of CHARMM and gnuplot , assuming both are installed in $PATH . If
+not, the reader can easily modify the command lines as to read these programs
+from the correct locations. Since not all our users have access to CHARMM,
+pre-calculated CHARMM outputs are provided so that the reader can simulate the
+CHARMM run by instead running the commented-out commands starting with "cp" or
+"gunzip". Ports of the CHARMM scripts to other MM programs are welcome for
+inclusion in future releases; please contact Kenno Vanommeslaeghe if you have
+made a faithful port.
 
 Side note: the README files in the subdirectories are formatted as
 Bourne-/POSIX-compatible shell scripts. Therefore, provided that all the
