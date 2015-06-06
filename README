@@ -2,21 +2,33 @@ Introduction
 ============
 Welcome to the lsfitpar program for robust fitting of bonded parameters. This program is the C reference implementation of our restrained Linear Least Squares (LLS) procedure to simultaneously fit all the bonded parameters in a Class I force field. The restraining strategy used in this methodology is novel and overcomes robustness issues in the LLS fitting of bonded parameters while minimally impacting the fitted values of well-behaved parameters. All of this and more is explained in the following paper: [1] K. Vanommeslaeghe, M. Yang, A. D. MacKerell Jr., J. Comput. Chem. 2015, DOI:10.1002/jcc.23897
 
+Obtaining lsfitpar
+==================
+The two most straightforward ways to obtain an up-to-date version of lsfiptar are:
+(A) Download a binary distibution for Linux (x86 architecture only) from http://mackerell.umaryland.edu/~kenno/lsfitpar/
+(B) Download the source from GitHub by going to https://github.com/kennovo/lsfitpar (this may be the page you're reading right now), clicking on the "Download ZIP" button to your right, and extracting the resulting file into an appropriate directory.
+
+If you chose option (B), compilation instructions can be found in the next section of this document. (Naturally, the same goes for developers who used "git clone", though be sure to read the CONTRIBUTING document.) Conversely, it you chose option (A), you can skip the section "Compiling" and directly jump to "Installing".
+
 Compiling
 =========
-If you're reading this on the lsfitpar home page on GitHub ( https://github.com/kennovo/lsfitpar ), your first step would be to download the lsfitpar distribution by clicking on the "Download ZIP" button to your right, and to extract it into an appropriate directory.
-The lsfitpar program depends on BLAS and LAPACK libraries as included in (among others) ATLAS, ACML, MKL, OpenBLAS,... The easiest way to install these on Debian-based Linux distributions (including the popular Linux Mint and Ubuntu) is:
+To compile lsfitpar, you need the "developmental versions" of the BLAS and LAPACK libraries as included in (among others) ATLAS, ACML, MKL, OpenBLAS,... The easiest way to install these on Debian-based Linux distributions (including the popular Linux Mint and Ubuntu) is:
 $ sudo apt-get install libblas-dev liblapack-dev
 Installation on other distributions should be very analogous. If gcc is used and the libraries are installed in the standard paths, the next step is simply:
 $ make
-This should produce a ready-to-run binary called lsfitpar that can be copied to a location that is part of the user's $PATH ( $HOME/bin is often a good choice). System-wide installation should be performed manually in /usr/local/bin or /opt ; we currently do not provide "make install" functionality (nor a man page or configure script).
-If a different compiler or nonstandard libraries are desired, the variables CC , CFLAGS and/or LDLIBS in the Makefile need to be edited manually. It should however be noted that the program finishes near-instantaneously using gcc and standard libraries, so doing this purely out of performance considerations makes little sense.
+This should produce a ready-to-run binary called lsfitpar ; installation instructions can be found in the next section of this document. If a different compiler or nonstandard libraries are desired, the variables CC , CFLAGS and/or LDLIBS in the Makefile need to be edited manually. It should however be noted that the program finishes near-instantaneously using gcc and standard libraries, so doing this purely out of performance considerations makes little sense.
+
+Installing
+==========
+To run the lsfitpar program on a different machine than the one on which it was compiled, you need the BLAS and LAPACK shared libraries as included in (among others) ATLAS, ACML, MKL, OpenBLAS,... The easiest way to install these on Debian-based Linux distributions (including the popular Linux Mint and Ubuntu) is:
+$ sudo apt-get install libblas3 liblapack3
+Installation on other distributions should be very analogous. After these libraries are installed, the binary can simply be run from the lsfitpar directory as ./lsfitpar , or from any other directory by providing the appropriate path. Alternatively, the lsfitpar binary can be copied to a location that is part of the user's $PATH ( $HOME/bin is often a good choice); no other files are required (assuming the aforementioned shared libraries are installed system-wide). System-wide installation of lsfitpar itself should be performed manually in /usr/local/bin or /opt ; we currently do not provide "make install" functionality (nor a man page or configure script).
 
 Documentation
 =============
 Instead of a conventional manual, the documentation of the lsfitpar program consists of 3 parts:
 	(1) The paper [1].
-	(2) A tutorial that can be found in the "examples" subdirectory; see the separate README file in that location. This tutorial guides the reader through the practical aspects of bonded parameter fitting and the different features of the lsfitpar program.
+	(2) A tutorial that can be found in the "examples" subdirectory; see the separate README document in that location. This tutorial guides the reader through the practical aspects of bonded parameter fitting and the different features of the lsfitpar program.
 	(3) A concise reference manual that can be obtained by passing the program the -h flag.
 It is suggested that both novice and experienced users work through all 3 parts in the above order, i.e. start with giving the paper a good read, then work through the tutorial, then use the reference manual for advanced use in application projects.
 
@@ -24,13 +36,13 @@ Important Usage Notes
 =====================
  - If you wish to publish results obtained with this program, don't forget to cite the information provided by passing the program the --version flag, including reference [1] above.
 - The interactive mode mentioned in the reference manual is easy-to-use, but not particularly flexible, portable or eligible for automation. While it may be a welcome tool for novice users to learn what kind of input the program requires, it is suggested to use the command-line mode in conjunction with the 'xargs' UNIX tool for production calculations, so that these calculations can efficiently be debugged and reproduced by means of a cleanly formatted configuration file.
- - This program is beta! While the interactive interface has been used routinely in the MacKerell lab since 2011, the command-line interface is a relatively new feature that was added shortly before the release of version 0.9.0, so there is a possibility of newly introduced bugs (even in interactive mode!) A prioritized list of outstanding issues and missing features can be found in the file ROADMAP . Of particular note is the fact that shifting the phases / reference values of the component functions such that they're centered around the initial guess phase / reference value (as explained in the section "Restraints with nonzero target" of the paper) has not been extensively tested in real life for the case of variable-phase dihedrals and impropers. The reason for this relative lack of testing is the fact that the use of variable-phase dihedrals and impropers is generally not recommended in all-atom force fields, as explained in the paper; this also mitigates the impact of any hypothetical issues with this functionality.
+ - This program is beta! While the interactive interface has been used routinely in the MacKerell lab since 2011, the command-line interface is a relatively new feature that was added shortly before the release of version 0.9.0, so there is a possibility of newly introduced bugs (even in interactive mode!) A prioritized list of outstanding issues and missing features can be found in the ROADMAP document. Of particular note is the fact that shifting the phases / reference values of the component functions such that they're centered around the initial guess phase / reference value (as explained in the section "Restraints with nonzero target" of the paper) has not been extensively tested in real life for the case of variable-phase dihedrals and impropers. The reason for this relative lack of testing is the fact that the use of variable-phase dihedrals and impropers is generally not recommended in all-atom force fields, as explained in the paper; this also mitigates the impact of any hypothetical issues with this functionality.
  - More generally spoken, if you encounter anything suspicious, please provide feedback.
  - The format of the input files is the same as for the MCSA fitting program described in [2] O. Guvench, A. D. MacKerell Jr., J. Mol. Model. 2008, DOI:10.1007/s00894-008-0305-0
 
 Feedback & contributing
 =======================
-See the file CONTRIBUTING .
+See the CONTRIBUTING document.
 
 Copyright & license
 ===================
