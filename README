@@ -5,7 +5,7 @@ Welcome to the lsfitpar program for robust fitting of bonded parameters. This pr
 Obtaining lsfitpar
 ==================
 The two most straightforward ways to obtain an up-to-date version of lsfiptar are:
-(A) Download a binary distibution for x86 Debian-based Linux distributions (including the popular Linux Mint and Ubuntu) from http://mackerell.umaryland.edu/~kenno/lsfitpar/
+(A) Download a binary distibution for Linux (x86 architecture only) from http://mackerell.umaryland.edu/~kenno/lsfitpar/
 (B) Download the source from GitHub by going to https://github.com/kennovo/lsfitpar (this may be the page you're reading right now), clicking on the "Download ZIP" button to your right, and extracting the resulting file into an appropriate directory.
 
 If you chose option (B), compilation instructions can be found in the next section of this document. (Naturally, the same goes for developers who used "git clone", though be sure to read the CONTRIBUTING document.) Conversely, it you chose option (A), you can skip the section "Compiling" and directly jump to "Installing".
