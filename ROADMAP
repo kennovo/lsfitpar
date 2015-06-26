@@ -4,7 +4,7 @@
 
 >= 0.9.4 : beta-stage features & testing:
 	- add (command-line-only) flag to perform rounding on the final K values
-	- per-multiplicity null biases (the data structures are already there and an updated help document is in the file futurehelp)
+	- per-multiplicity bias fractions (the data structures are already there and an updated help document is in the file futurehelp)
 	- per-multiplicity weight factors? (not equivalent to null biases! see page labeled "NEW 2" in paper notes + 1EOX results as mentioned in CVS commit message 1.20)
 	- try concerted fits on Lei's compounds (very clean testcase)
 
