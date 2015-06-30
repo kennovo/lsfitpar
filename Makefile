@@ -28,6 +28,35 @@ clean      :
 debug      : CFLAGS=$(DEBUG)
 debug      : all
 
+# Warning: distributing a static binary that was created this way counts as
+# redistributing a modified binary form of all the libraries to which we're
+# linking. For example, if we have "LDLIBS= -llapack -lblas -lm" above, and
+# we're linking against the libm that comes with gnu libc and BSD
+# implementations of libblas and liblapack that were linked against
+# libgfortran, we're also taking libm, libc, libgcc_s, libpthread and
+# libquadmath with us. We need to satisfy the conditions for distributing all
+# of these. Most of them are LGPL which can be linked into this GPL program
+# without worries. The exception is the 3-clause BSD license of libblas and
+# liblapack . I've seen different opinions on whether a BSD acknowledgement
+# and/or disclaimer need to be distributed in the binary and/or its
+# documentation. Most people don't, but to play it really safe, one should
+# either consult a lawyer or just precautionary include the acknowledgements
+# and disclaimers anyway.
+# In modern versions of the Netlib libraries and derivatives (e.g. Atlas),
+# xerbla_ is defined both in BLAS and LAPACK, leading to the dreaded "multiple
+# definition" error. Of all the solutions that can be found online (further
+# discussed in private README.static ), the following is by far the most
+# portable (albeit also the most dangerous, because if there are other
+# unexpected symbol clashes, it might quietly do the wrong thing).
+# The -lgfortran is necessary because its functions are called by blas . It is
+# possible to link lapack and blas static and libgfortran , libm , libpthread ,
+# libquadmath ,... dynamic, but then we get a build procedure that is either
+# vastly more complex or vastly less portable (we've been doing the latter in
+# the past).
+static     : LDLIBS += -lgfortran
+static     : LDFLAGS += -static -Wl,--allow-multiple-definition
+static     : all
+
 ## As long as you're compiling a native binary on a little-endian architecture
 ## such as x86, everything below this point can safely be ignored; see the
 ## comments in the source code for explanation.
